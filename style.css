@@ -1,0 +1,72 @@
+/* Custom Configuration & Variable Fallbacks */
+:root {
+    --safety-orange: #D9480F;
+    --safety-orange-dark: #B83A09;
+    --safety-yellow: #F59E0B;
+    --industrial-blue: #1E293B;
+    --tv-bg: #0F172A;
+}
+
+/* Custom Tailwind utility extensions */
+.bg-safety-orange { background-color: var(--safety-orange); }
+.bg-safety-orange-dark { background-color: var(--safety-orange-dark); }
+.bg-safety-yellow { background-color: var(--safety-yellow); }
+.bg-industrial-blue { background-color: var(--industrial-blue); }
+.bg-tv-bg { background-color: var(--tv-bg); }
+
+.border-safety-orange { border-color: var(--safety-orange); }
+.text-safety-orange { color: var(--safety-orange); }
+
+/* Custom Scrollbar optimized for Google TV Screen Viewports */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+/* D-Pad & Keyboard Focus Styling for Smart TV Navigation */
+.focused-element,
+button:focus,
+input:focus {
+    outline: 4px solid var(--safety-orange) !important;
+    outline-offset: 2px;
+}
+
+/* Custom Option Styling for Native Dropdowns */
+select option {
+    padding: 12px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0F172A;
+    background-color: #FFFFFF;
+}
+
+/* Custom Dropdown Styling & Animations */
+.dropdown-item:focus,
+.dropdown-item:hover {
+    background-color: #FFF4E6 !important; /* light safety orange tint */
+    outline: none;
+}
+
+.dropdown-item:focus span,
+.dropdown-item:hover span {
+    color: #D9480F !important;
+}
+
+/* Subtly rotate arrow when dropdown opens */
+.arrow-rotate {
+    transform: rotate(180deg);
+}

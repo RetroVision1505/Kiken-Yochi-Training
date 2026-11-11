@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYT Digital - Kiken Yochi Training (Google TV UI)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- Tailwind Custom Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'safety-orange': '#D9480F',
+                        'safety-orange-dark': '#B83A09',
+                        'safety-yellow': '#F59E0B',
+                        'industrial-blue': '#1E293B',
+                        'tv-bg': '#0F172A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-tv-bg text-slate-800 font-sans min-h-screen flex flex-col items-center justify-center p-2 md:p-6 overflow-x-hidden select-none">
+
+    <!-- Container Utama TV (Scale Controller) -->
+    <div class="w-full max-w-[1920px] bg-slate-100 rounded-2xl shadow-2xl overflow-hidden flex flex-col border-4 border-slate-700 relative min-h-[900px]">
+        
+        <!-- HEADER UTAMA APLIKASI (PERMANEN) -->
+        <header class="bg-industrial-blue text-white px-8 py-4 flex justify-between items-center border-b-4 border-safety-orange flex-shrink-0">
+            <!-- Brand & Identitas Pabrik -->
+            <div class="flex items-center space-x-6">
+                <div class="bg-safety-orange p-3 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid font-black text-white text-3xl">KYT</i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-wide text-white">
+                        KYT DIGITAL <span class="text-slate-400 font-normal text-xl">| PT. SOMIC INDONESIA</span>
+                    </h1>
+                    <div class="text-slate-300 text-lg font-medium flex items-center gap-3 mt-1">
+                        <span class="inline-block w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                        
+                        <!-- Custom Shift Dropdown UI -->
+                        <div class="relative inline-block">
+                            <button type="button" id="custom-shift-btn" onclick="toggleShiftDropdown()" 
+                                class="bg-slate-800 text-amber-400 border border-slate-600 rounded-lg py-1 px-3.5 text-base font-extrabold flex items-center gap-2 hover:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400 transition">
+                                <span id="selected-shift-text">Shift A</span>
+                                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" id="shift-dropdown-arrow"></i>
+                            </button>
+
+                            <!-- Dropdown Menu List -->
+                            <div id="custom-shift-menu" class="hidden absolute left-0 top-full mt-2 w-36 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl overflow-hidden z-50 divide-y divide-slate-700 animate-fadeIn">
+                                <div class="shift-item px-4 py-2.5 flex items-center justify-between cursor-pointer hover:bg-slate-700 transition" onclick="selectShift('Shift A')">
+                                    <span class="text-base font-extrabold text-amber-400">Shift A</span>
+                                    <i class="fa-solid fa-check text-amber-400 text-sm shift-check"></i>
+                                </div>
+                                <div class="shift-item px-4 py-2.5 flex items-center justify-between cursor-pointer hover:bg-slate-700 transition" onclick="selectShift('Shift B')">
+                                    <span class="text-base font-extrabold text-slate-200">Shift B</span>
+                                    <i class="fa-solid fa-check text-amber-400 text-sm shift-check hidden"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span>Maintenance Area section | <strong>Agung Kurniawan</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigasi Layar untuk Remote TV / Keyboard -->
+            <nav class="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700 gap-2">
+                <button onclick="switchScreen(1)" id="nav-btn-1" class="nav-tab px-6 py-3 rounded-lg text-xl font-bold transition flex items-center gap-3 bg-safety-orange text-white shadow-md">
+                    <i class="fa-solid fa-pen-to-square text-2xl"></i> 1. Input Member
+                </button>
+                <button onclick="switchScreen(2)" id="nav-btn-2" class="nav-tab px-6 py-3 rounded-lg text-xl font-bold transition flex items-center gap-3 text-slate-300 hover:text-white hover:bg-slate-700">
+                    <i class="fa-solid fa-chalkboard text-2xl"></i> 2. Papan Tulis Tim
+                </button>
+                <button onclick="switchScreen(3)" id="nav-btn-3" class="nav-tab px-6 py-3 rounded-lg text-xl font-bold transition flex items-center gap-3 text-slate-300 hover:text-white hover:bg-slate-700">
+                    <i class="fa-solid fa-chart-column text-2xl"></i> 3. Rekap Safety
+                </button>
+            </nav>
+        </header>
+        
+
+        <!-- Dynamic Main Content Area -->
+        <main class="flex-1 bg-slate-100 overflow-hidden relative flex flex-col">
+
+            <!-- ========================================== -->
+            <!-- LAYAR 1: INPUT PER MEMBER (FORM)          -->
+            <!-- ========================================== -->
+            <section id="screen-1" class="screen-content flex-1 flex flex-col p-6 gap-6 overflow-y-auto">
+                <!-- Status Bar Ronde KYT (1R - 4R) -->
+                <div class="grid grid-cols-4 gap-4 flex-shrink-0">
+                    <div class="bg-white border-2 border-safety-orange p-3.5 rounded-xl shadow-sm flex items-center justify-between">
+                        <div>
+                            <span class="text-sm font-bold text-safety-orange uppercase tracking-wider block">Tahap Aktif</span>
+                            <span class="text-xl font-black text-slate-900">1R-2R: Bahaya Terjadi</span>
+                        </div>
+                        <span class="w-10 h-10 rounded-full bg-safety-orange text-white font-black flex items-center justify-center text-xl">1</span>
+                    </div>
+                    <div class="bg-slate-200/80 border border-slate-300 p-3.5 rounded-xl flex items-center justify-between opacity-70">
+                        <div>
+                            <span class="text-sm font-bold text-slate-500 uppercase tracking-wider block">Berikutnya</span>
+                            <span class="text-xl font-bold text-slate-700">3R: Tindakan Pribadi</span>
+                        </div>
+                        <span class="w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center text-xl">3</span>
+                    </div>
+                    <div class="bg-slate-200/80 border border-slate-300 p-3.5 rounded-xl flex items-center justify-between opacity-70">
+                        <div>
+                            <span class="text-sm font-bold text-slate-500 uppercase tracking-wider block">Berikutnya</span>
+                            <span class="text-xl font-bold text-slate-700">4R: Tindakan Bersama</span>
+                        </div>
+                        <span class="w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center text-xl">4</span>
+                    </div>
+                    <div class="bg-slate-200/80 border border-slate-300 p-3.5 rounded-xl flex items-center justify-between opacity-70">
+                        <div>
+                            <span class="text-sm font-bold text-slate-500 uppercase tracking-wider block">Penutup</span>
+                            <span class="text-xl font-bold text-slate-700">Yel-Yel (Point & Call)</span>
+                        </div>
+                        <span class="w-10 h-10 rounded-full bg-slate-300 text-slate-600 font-bold flex items-center justify-center text-xl"><i class="fa-solid fa-bullhorn"></i></span>
+                    </div>
+                </div>
+
+                <!-- Content Split 2 Column (Kiri 5 Cols, Kanan 7 Cols) -->
+                <div class="grid grid-cols-12 gap-6 flex-1 min-h-[580px]">
+                    
+                    <!-- Kiri: Upload & Preview Foto Bahaya KYT (5 Cols) -->
+                    <div class="col-span-5 bg-white rounded-2xl p-6 border-2 border-slate-200 shadow-md flex flex-col justify-between">
+                        <!-- Header Foto tanpa teks Area -->
+                        <div class="flex justify-start items-center mb-3">
+                            <span class="bg-red-100 text-red-700 font-extrabold px-4 py-2 rounded-xl text-lg flex items-center gap-2 border border-red-200 shadow-sm">
+                                <i class="fa-solid fa-triangle-exclamation text-xl"></i> FOTO KEJADIAN <span id="kyt-number-tag">#01</span>
+                            </span>
+                        </div>
+                        
+                        <!-- Box Input / Preview Upload Foto -->
+                        <div class="relative flex-1 min-h-[260px] bg-slate-900 rounded-xl overflow-hidden border-2 border-dashed border-slate-400 flex flex-col items-center justify-center cursor-pointer group hover:border-safety-orange transition" onclick="document.getElementById('photo-upload-input').click()">
+                            <!-- Hidden File Input -->
+                            <input type="file" id="photo-upload-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                            
+                            <!-- State 1: Belum Ada Foto (Placeholder UI) -->
+                            <div id="upload-placeholder" class="flex flex-col items-center justify-center text-center p-6 space-y-3">
+                                <div class="w-16 h-16 rounded-full bg-slate-800 text-safety-orange flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xl font-extrabold text-white">Klik / Upload Foto Bahaya</p>
+                                    <p class="text-slate-400 font-medium text-sm mt-1">Format: JPG, PNG (Maks 10MB)</p>
+                                </div>
+                                <span class="px-5 py-2.5 bg-safety-orange text-white text-base font-extrabold rounded-lg shadow-md group-hover:bg-safety-orange-dark transition">
+                                    Pilih File Foto
+                                </span>
+                            </div>
+
+                            <!-- State 2: Foto Preview -->
+                            <img id="photo-preview-img" class="w-full h-full object-cover hidden" alt="Foto Bahaya KYT">
+                        </div>
+
+                        <!-- Deskripsi Ringkas -->
+                        <div class="mt-4">
+                            <label class="block text-slate-800 font-extrabold text-base mb-1.5">
+                                Deskripsi Ringkas Situasi Bahaya:
+                            </label>
+                            <textarea id="input-deskripsi-foto" rows="2" 
+                                class="w-full bg-slate-50 border-2 border-slate-300 rounded-xl p-3.5 text-lg font-semibold text-slate-900 focus:bg-white focus:border-safety-orange focus:ring-4 focus:ring-orange-100 transition outline-none resize-none"
+                                placeholder="Ketik ringkasan kondisi lokasi / kejadian bahaya..."></textarea>
+                        </div>
+
+                        <!-- Info Member Pengisi (Custom UI Dropdown for Smart TV) -->
+                        <div class="mt-4 p-4 bg-slate-50 rounded-2xl border-2 border-slate-200 flex items-center gap-4 relative">
+                            <div id="member-avatar" class="w-14 h-14 rounded-full bg-industrial-blue text-white flex items-center justify-center text-2xl font-black shadow-md flex-shrink-0">
+                                A
+                            </div>
+                            <div class="flex-1 relative">
+                                <span class="text-slate-500 font-extrabold text-xs tracking-wider uppercase block mb-1">MEMBER PENGISI</span>
+                                
+                                <!-- Custom Dropdown Trigger Button -->
+                                <button type="button" id="custom-dropdown-btn" onclick="toggleCustomDropdown()" 
+                                    class="w-full bg-white border-2 border-slate-300 rounded-xl py-3 px-4 flex items-center justify-between text-xl font-extrabold text-slate-900 shadow-sm hover:border-safety-orange focus:border-safety-orange focus:ring-4 focus:ring-orange-100 transition outline-none">
+                                    <span id="selected-member-name">Andri Irawan</span>
+                                    <i class="fa-solid fa-chevron-down text-safety-orange text-lg transition-transform duration-200" id="dropdown-arrow"></i>
+                                </button>
+
+                                <!-- Custom Dropdown Menu List -->
+                                <div id="custom-dropdown-menu" class="hidden absolute left-0 right-0 bottom-full mb-2 bg-white border-2 border-slate-300 rounded-2xl shadow-2xl overflow-hidden z-50 divide-y divide-slate-100 animate-fadeIn">
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Andri Irawan', 'A')">
+                                        <span class="text-xl font-extrabold text-slate-900">Andri Irawan</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Aji Widodo', 'A')">
+                                        <span class="text-xl font-extrabold text-slate-900">Aji Widodo</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Ari Irmawan', 'A')">
+                                        <span class="text-xl font-extrabold text-slate-900">Ari Irmawan</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Alex Nugroho', 'A')">
+                                        <span class="text-xl font-extrabold text-slate-900">Alex Nugroho</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Rafizilla', 'R')">
+                                        <span class="text-xl font-extrabold text-slate-900">Rafizilla</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Yodie', 'Y')">
+                                        <span class="text-xl font-extrabold text-slate-900">Yodie</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Fauzi', 'F')">
+                                        <span class="text-xl font-extrabold text-slate-900">Fauzi</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Dean', 'D')">
+                                        <span class="text-xl font-extrabold text-slate-900">Dean</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                    <div class="dropdown-item px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-orange-50 transition" onclick="selectMember('Bintang Febriansyah', 'B')">
+                                        <span class="text-xl font-extrabold text-slate-900">Bintang Febriansyah</span>
+                                        <i class="fa-solid fa-check text-safety-orange text-lg check-mark hidden"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Kanan: Form Input (7 Cols) - Opsi 2 Clean Panel Layout -->
+                    <div class="col-span-7 bg-white rounded-2xl p-6 border-2 border-slate-200 shadow-md flex flex-col justify-between">
+                        <div class="space-y-4">
+                            
+                            <!-- Input 1: Pada Saat -->
+                            <div>
+                                <label class="block text-lg font-extrabold text-slate-900 mb-1.5 flex items-center justify-between">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-industrial-blue text-white flex items-center justify-center text-xs font-black">1</span>
+                                        Pada saat... <span class="text-slate-500 font-semibold text-base">(Perilaku / Kondisi Kerja)</span>
+                                    </span>
+                                    <span class="text-xs bg-slate-100 text-slate-600 font-bold px-2.5 py-0.5 rounded-md border border-slate-200">Teks Bebas</span>
+                                </label>
+                                <input type="text" id="input-perilaku" value="" 
+                                    class="w-full bg-slate-50 border-2 border-slate-300 rounded-xl p-3 text-xl font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:bg-white focus:border-safety-orange focus:ring-4 focus:ring-orange-100 transition outline-none shadow-sm"
+                                    placeholder="Contoh: Memasang bucket pada belt conveyor menggunakan kunci pas...">
+                            </div>
+
+                            <!-- Input 2: Dikarenakan -->
+                            <div>
+                                <label class="block text-lg font-extrabold text-slate-900 mb-1.5 flex items-center justify-between">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-industrial-blue text-white flex items-center justify-center text-xs font-black">2</span>
+                                        Dikarenakan... <span class="text-slate-500 font-semibold text-base">(Penyebab Bahaya)</span>
+                                    </span>
+                                    <span class="text-xs bg-slate-100 text-slate-600 font-bold px-2.5 py-0.5 rounded-md border border-slate-200">Teks Bebas</span>
+                                </label>
+                                <input type="text" id="input-penyebab" value="" 
+                                    class="w-full bg-slate-50 border-2 border-slate-300 rounded-xl p-3 text-xl font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:bg-white focus:border-safety-orange focus:ring-4 focus:ring-orange-100 transition outline-none shadow-sm"
+                                    placeholder="Contoh: Tangan terlalu dekat dengan roda pemutar & mesin belum LOTO...">
+                            </div>
+
+                            <!-- Input 3: Jenis Insiden Potensial (Grid Pill Buttons 4 Kolom) -->
+                            
+                            <div>
+                                <label class="block text-lg font-extrabold text-slate-900 mb-2 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-industrial-blue text-white flex items-center justify-center text-xs font-black">3</span>
+                                    Jenis Insiden Potensial <span class="text-slate-500 font-semibold text-base">(Pilih Satu)</span>
+                                </label>
+                                <div class="grid grid-cols-4 gap-2" id="chip-container-insiden">
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Memar</button>
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Patah Tulang</button>
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Terputus</button>
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Tergores</button>
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Robek</button>
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Tersetrum</button>
+                                    <button type="button" class="chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Nyeri Punggung</button>
+                                    <button type="button" class="chip-bar chip-btn py-2 px-2 bg-slate-50 text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Buta</button>
+                                    
+                                    <!-- Tombol Lainnya dari awal sudah set col-span-4 agar lebarnya pas selebar 4 card di atasnya -->
+                                    <button type="button" id="btn-custom-insiden" onclick="toggleCustomInsidenInput()" 
+                                        class="chip-btn col-span-4 py-2 px-2 bg-amber-50 text-amber-900 font-extrabold rounded-lg text-xs border-2 border-amber-300 hover:border-safety-orange transition text-center flex items-center justify-center gap-1 shadow-sm">
+                                        <i class="fa-solid fa-pen-to-square text-[10px]"></i> + Lainnya
+                                    </button>
+                                </div>
+
+                                <!-- Input Box Custom Insiden (Terpisah di bawah grid dengan lebar penuh yang rapi) -->
+                                <div id="box-custom-insiden" class="hidden mt-2">
+                                    <input type="text" id="input-insiden-custom" 
+                                        class="w-full bg-white border-2 border-safety-orange rounded-xl p-2.5 text-base font-bold text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-orange-100 transition outline-none shadow-sm"
+                                        placeholder="Ketik jenis insiden khusus di sini...">
+                                </div>
+                            </div>
+
+                            <!-- Input 4 & 5: Mengenai Bagian & Jenis Cedera (Panel Berdampingan Rapi) -->
+                            <div class="grid grid-cols-2 gap-4 pt-1">
+                                <!-- Panel Nomor 4: Mengenai Bagian (Sistem Sama dengan No. 3) -->
+                                <div class="bg-slate-50/90 p-3.5 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col justify-between">
+                                    <div>
+                                        <label class="block text-base font-extrabold text-slate-900 mb-2 flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-full bg-industrial-blue text-white flex items-center justify-center text-xs font-black">4</span>
+                                            Mengenai Bagian <span class="text-slate-500 font-semibold text-xs">(Pilih Satu)</span>
+                                        </label>
+                                        
+                                        <!-- Grid Chip Bagian Tubuh -->
+                                        <div class="grid grid-cols-3 gap-1.5" id="chip-container-bagian">
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Kepala</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Mata</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Muka</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Tulang</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Lengan</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Tangan</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Perut</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Bokong</button>
+                                            <button type="button" class="chip-bagian py-2 px-1 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Kaki</button>
+                                            
+                                            <!-- Tombol Lainnya Memanjang 3 Kolom Menutup Baris Terakhir -->
+                                            <button type="button" id="btn-custom-bagian" onclick="toggleCustomBagianInput()" class="chip-bagian col-span-3 py-2 px-2 bg-amber-50 text-amber-900 font-extrabold rounded-lg text-xs border-2 border-amber-300 hover:border-safety-orange transition text-center flex items-center justify-center gap-1 shadow-sm">
+                                                <i class="fa-solid fa-pen-to-square text-[10px]"></i> + Lainnya
+                                            </button>
+                                        </div>
+
+                                        <!-- Input Box Custom Bagian Tubuh (Hidden by Default) -->
+                                        <div id="box-custom-bagian" class="hidden mt-2">
+                                            <input type="text" id="input-bagian-custom" 
+                                                class="w-full bg-white border-2 border-safety-orange rounded-xl p-2 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-orange-100 transition outline-none shadow-sm"
+                                                placeholder="Ketik bagian khusus...">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Panel Nomor 5 -->
+                                <div class="bg-slate-50/90 p-3.5 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col justify-between">
+                                    <label class="block text-base font-extrabold text-slate-900 mb-2 flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-industrial-blue text-white flex items-center justify-center text-xs font-black">5</span>
+                                        Jenis Cedera
+                                    </label>
+                                    <div class="grid grid-cols-2 gap-1.5" id="chip-container-cedera">
+                                        <button type="button" class="chip-btn py-2 px-2 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Memar</button>
+                                        <button type="button" class="chip-btn py-2 px-2 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Patah Tulang</button>
+                                        <button type="button" class="chip-btn py-2 px-2 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Tergores</button>
+                                        <button type="button" class="chip-btn py-2 px-2 bg-white text-slate-800 font-extrabold rounded-lg text-xs border-2 border-slate-200 hover:border-safety-orange transition text-center shadow-sm">Robek</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Tombol Aksi Simpan Form -->
+                        <div class="pt-3 mt-3 border-t border-slate-200 flex justify-end gap-3">
+                            <button type="button" onclick="switchScreen(2)" class="px-6 py-3 bg-slate-200 text-slate-700 text-lg font-extrabold rounded-xl hover:bg-slate-300 transition">
+                                Lewati
+                            </button>
+                            <button type="button" onclick="switchScreen(2)" class="px-8 py-3 bg-safety-orange text-white text-lg font-black rounded-xl hover:bg-safety-orange-dark shadow-lg flex items-center gap-2">
+                                <i class="fa-solid fa-check text-xl"></i> SIMPAN BARIS (ENTER)
+                            </button>
+                        </div>
+                    </div>
+                    
+
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- LAYAR 2: TABEL PAPAN TULIS DIGITAL TIM     -->
+            <!-- ========================================== -->
+            <section id="screen-2" class="screen-content flex-1 flex flex-col p-6 gap-5 overflow-hidden hidden">
+                
+                <!-- Main Board Header -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 shadow-sm flex items-center justify-between flex-shrink-0">
+                    <div class="flex items-center gap-4">
+                        <span class="bg-industrial-blue text-white font-black px-4 py-2 rounded-lg text-xl">PAPAN KYT DIGITAL</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900">Topik: Perbaikan & Pemasangan Bucket Belt Conveyor</h2>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <span class="text-xl font-bold text-slate-600"><i class="fa-solid fa-users text-safety-orange"></i> Anggota: 4 Orang</span>
+                        <span class="bg-emerald-100 text-emerald-800 text-lg font-black px-4 py-1.5 rounded-lg border border-emerald-300">Ronde 1R-4R Lengkap</span>
+                    </div>
+                </div>
+
+                <!-- Split Content: Main Table & Bottom Action Boxes -->
+                <div class="flex-1 flex flex-col gap-4 min-h-0">
+                    
+                    <!-- TABEL RONDE 1R-2R -->
+                    <div class="bg-white rounded-2xl border-2 border-slate-300 shadow-md overflow-hidden flex-1 flex flex-col">
+                        <div class="overflow-y-auto flex-1">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-800 text-white text-xl sticky top-0 z-10">
+                                    <tr>
+                                        <th class="p-3.5 border-b border-slate-700 w-16 text-center">Pilih</th>
+                                        <th class="p-3.5 border-b border-slate-700 w-44">Penemu</th>
+                                        <th class="p-3.5 border-b border-slate-700">1R & 2R: Bahaya Yang Akan Terjadi (Perilaku & Penyebab)</th>
+                                        <th class="p-3.5 border-b border-slate-700 w-36">Insiden</th>
+                                        <th class="p-3.5 border-b border-slate-700 w-36">Bagian</th>
+                                        <th class="p-3.5 border-b border-slate-700 w-44">Jenis Cedera</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-xl font-semibold text-slate-800 divide-y divide-slate-200">
+                                    
+                                    <!-- Baris 1: Andri (Bahaya Utama) -->
+                                    <tr class="bg-orange-50/90 border-l-8 border-l-safety-orange">
+                                        <td class="p-3.5 text-center">
+                                            <i class="fa-solid fa-star text-3xl text-safety-orange animate-bounce"></i>
+                                        </td>
+                                        <td class="p-3.5 font-extrabold text-slate-900">
+                                            Andri <span class="block text-xs text-safety-orange font-black uppercase">Bahaya Utama</span>
+                                        </td>
+                                        <td class="p-3.5">
+                                            Pada saat <span class="font-bold underline decoration-safety-orange decoration-2">memasang baut dengan impact</span>, dikarenakan <span class="font-bold text-slate-900">tangan memegang bucket yang licin dan mesin belum terkunci</span>.
+                                        </td>
+                                        <td class="p-3.5">
+                                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-lg text-lg font-bold border border-red-200">Terjepit</span>
+                                        </td>
+                                        <td class="p-3.5">Tangan</td>
+                                        <td class="p-3.5 text-red-700 font-bold">Patah tulang</td>
+                                    </tr>
+
+                                    <!-- Baris 2: Yudie -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3.5 text-center">
+                                            <i class="fa-regular fa-circle text-2xl text-slate-300"></i>
+                                        </td>
+                                        <td class="p-3.5 font-bold text-slate-900">Yudie</td>
+                                        <td class="p-3.5">
+                                            Pada saat <span class="font-bold">mengangkat kunci shock impact</span>, dikarenakan <span class="font-bold">kabel terurai di lantai kerja</span>.
+                                        </td>
+                                        <td class="p-3.5">
+                                            <span class="bg-slate-100 text-slate-800 px-3 py-1 rounded-lg text-lg font-bold">Tersandung</span>
+                                        </td>
+                                        <td class="p-3.5">Kaki</td>
+                                        <td class="p-3.5">Memar</td>
+                                    </tr>
+
+                                    <!-- Baris 3: Aji -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3.5 text-center">
+                                            <i class="fa-regular fa-circle text-2xl text-slate-300"></i>
+                                        </td>
+                                        <td class="p-3.5 font-bold text-slate-900">Aji</td>
+                                        <td class="p-3.5">
+                                            Pada saat <span class="font-bold">memasang bucket pada belt</span>, dikarenakan <span class="font-bold">posisi berdiri terlalu membungkuk lama</span>.
+                                        </td>
+                                        <td class="p-3.5">
+                                            <span class="bg-slate-100 text-slate-800 px-3 py-1 rounded-lg text-lg font-bold">Terpelintir</span>
+                                        </td>
+                                        <td class="p-3.5">Badan</td>
+                                        <td class="p-3.5">Nyeri punggung</td>
+                                    </tr>
+
+                                    <!-- Baris 4: Rafi -->
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-3.5 text-center">
+                                            <i class="fa-regular fa-circle text-2xl text-slate-300"></i>
+                                        </td>
+                                        <td class="p-3.5 font-bold text-slate-900">Rafi</td>
+                                        <td class="p-3.5">
+                                            Pada saat <span class="font-bold">membersihkan sisa serpihan baut</span>, dikarenakan <span class="font-bold">tidak memakai kacamata pelindung</span>.
+                                        </td>
+                                        <td class="p-3.5">
+                                            <span class="bg-slate-100 text-slate-800 px-3 py-1 rounded-lg text-lg font-bold">Terkena</span>
+                                        </td>
+                                        <td class="p-3.5">Mata</td>
+                                        <td class="p-3.5">Tergores</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- KOTAK 3R, 4R, & YEL-YEL -->
+                    <div class="grid grid-cols-12 gap-4 h-48 flex-shrink-0">
+                        
+                        <!-- 3R: Tindakan Pribadi (4 Cols) -->
+                        <div class="col-span-4 bg-white p-4 rounded-2xl border-2 border-slate-300 shadow-md flex flex-col">
+                            <div class="flex items-center gap-2 mb-2 pb-1 border-b border-slate-200">
+                                <span class="bg-blue-600 text-white font-extrabold text-sm px-2.5 py-0.5 rounded">3R</span>
+                                <h3 class="text-xl font-extrabold text-slate-900">Tindakan Pencegahan Pribadi</h3>
+                            </div>
+                            <div class="space-y-1.5 overflow-y-auto text-lg font-bold text-slate-700">
+                                <p><span class="text-safety-orange font-black">[AK]</span> Andri: Pasang Ganjal Belt & Sarung Tangan anti-slip!</p>
+                                <p><span class="text-blue-600 font-black">[YD]</span> Yudie: Rapikan jalur kabel impact pneumatic!</p>
+                                <p><span class="text-emerald-600 font-black">[AJ]</span> Aji: Posisikan ergo tubuh tegak saat pasang bucket!</p>
+                                <p><span class="text-purple-600 font-black">[RF]</span> Rafi: Gunakan Safety Glasses sebelum bersih-bersih!</p>
+                            </div>
+                        </div>
+
+                        <!-- 4R: Tindakan Bersama / Tim (4 Cols) -->
+                        <div class="col-span-4 bg-white p-4 rounded-2xl border-2 border-slate-300 shadow-md flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-2 pb-1 border-b border-slate-200">
+                                    <span class="bg-emerald-600 text-white font-extrabold text-sm px-2.5 py-0.5 rounded">4R</span>
+                                    <h3 class="text-xl font-extrabold text-slate-900">Tindakan Konkrit Bersama</h3>
+                                </div>
+                                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-center">
+                                    <p class="text-slate-500 font-bold text-xs uppercase mb-1">Template Target Tim</p>
+                                    <p class="text-xl font-black text-slate-900 leading-snug">
+                                        "Pada saat memasang bucket conveyor, <span class="text-safety-orange">luruskan & posisikan belt dengan aman</span>, <span class="text-emerald-700">Ayo Kita Yosh!</span>"
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- YEL-YEL / POINT & CALL (4 Cols Highlighted) -->
+                        <div class="col-span-4 bg-gradient-to-br from-safety-orange to-red-700 text-white p-4 rounded-2xl shadow-lg border-2 border-orange-400 flex flex-col justify-between">
+                            <div class="flex justify-between items-center">
+                                <span class="bg-white/20 text-white font-black text-sm px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bullhorn"></i> Yel-Yel KYT (Point & Call)
+                                </span>
+                                <span class="bg-yellow-400 text-slate-900 font-black text-lg px-3 py-0.5 rounded-md">3x Pengulangan</span>
+                            </div>
+                            <div class="text-center my-auto">
+                                <p class="text-slate-200 text-base font-bold">Kalimat Ditunjuk & Diucapkan:</p>
+                                <h4 class="text-3xl font-black tracking-wide text-yellow-300 drop-shadow">
+                                    "Luruskan belt (yosh!)"
+                                </h4>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-orange-100 font-semibold pt-2 border-t border-white/20">
+                                <span><i class="fa-solid fa-hand-point-right text-yellow-300 text-base"></i> Tunjuk dengan 3 Jari</span>
+                                <span>Suara Lantang & Tegas!</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ========================================== -->
+            <!-- LAYAR 3: DASHBOARD REKAP SAFETY & ANALITIK  -->
+            <!-- ========================================== -->
+            <section id="screen-3" class="screen-content flex-1 flex flex-col p-6 gap-6 overflow-hidden hidden">
+                
+                <!-- Summary Header KPI Cards (4 Stat Cards) -->
+                <div class="grid grid-cols-4 gap-6 flex-shrink-0">
+                    <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 font-extrabold text-base uppercase">Kepatuhan KYT Hari Ini</p>
+                            <h3 class="text-4xl font-black text-emerald-600">98.5%</h3>
+                            <p class="text-slate-400 font-semibold text-sm mt-1">&uparrow; 2.1% dari minggu lalu</p>
+                        </div>
+                        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl font-bold">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 font-extrabold text-base uppercase">Total Bahaya Terdata</p>
+                            <h3 class="text-4xl font-black text-slate-900">142</h3>
+                            <p class="text-slate-400 font-semibold text-sm mt-1">Bulan Ini (Bulan 11)</p>
+                        </div>
+                        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl font-bold">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 font-extrabold text-base uppercase">Bahaya Paling Sering</p>
+                            <h3 class="text-3xl font-black text-safety-orange">Terjepit</h3>
+                            <p class="text-slate-400 font-semibold text-sm mt-1">42% dari total insiden</p>
+                        </div>
+                        <div class="w-16 h-16 bg-orange-100 text-safety-orange rounded-2xl flex items-center justify-center text-3xl font-bold">
+                            <i class="fa-solid fa-hand-line"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 font-extrabold text-base uppercase">Tim Aktif KYT</p>
+                            <h3 class="text-4xl font-black text-slate-900">12 / 12</h3>
+                            <p class="text-slate-400 font-semibold text-sm mt-1">100% Tim Mengisi</p>
+                        </div>
+                        <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-3xl font-bold">
+                            <i class="fa-solid fa-users-gear"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Split View (2 Main Visualization Blocks) -->
+                <div class="grid grid-cols-12 gap-6 flex-1 min-h-0">
+                    
+                    <!-- Grafik 1: Bahaya Terbanyak per Area & Shift (7 Cols) -->
+                    <div class="col-span-7 bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-md flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-2xl font-extrabold text-slate-900">Bahaya Terbanyak per Area & Shift</h3>
+                                <p class="text-slate-500 font-bold text-base">Perbandingan frekuensi penemuan bahaya</p>
+                            </div>
+                            <span class="bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-lg text-sm">Update Terakhir: Today 07:00</span>
+                        </div>
+
+                        <!-- Visual Bar Chart CSS Custom -->
+                        <div class="space-y-4 flex-1 flex flex-col justify-center">
+                            <div>
+                                <div class="flex justify-between text-lg font-bold mb-1">
+                                    <span class="text-slate-800">Line 1 & 2 Belt Conveyor (Shift 1)</span>
+                                    <span class="text-safety-orange font-black">48 Bahaya</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-6 rounded-full overflow-hidden flex">
+                                    <div class="bg-safety-orange h-full rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-lg font-bold mb-1">
+                                    <span class="text-slate-800">Area Stamping & Press (Shift 1)</span>
+                                    <span class="text-slate-700 font-black">32 Bahaya</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-6 rounded-full overflow-hidden flex">
+                                    <div class="bg-industrial-blue h-full rounded-full" style="width: 50%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-lg font-bold mb-1">
+                                    <span class="text-slate-800">Assembly Line B (Shift 2)</span>
+                                    <span class="text-slate-700 font-black">24 Bahaya</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-6 rounded-full overflow-hidden flex">
+                                    <div class="bg-blue-500 h-full rounded-full" style="width: 38%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-lg font-bold mb-1">
+                                    <span class="text-slate-800">Gudang & Logistik Material (Shift 1)</span>
+                                    <span class="text-slate-700 font-black">18 Bahaya</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-6 rounded-full overflow-hidden flex">
+                                    <div class="bg-emerald-500 h-full rounded-full" style="width: 28%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-6 pt-4 border-t border-slate-200 text-sm font-bold text-slate-600">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-safety-orange rounded-full"></span> Conveyor Area</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-industrial-blue rounded-full"></span> Stamping</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> Assembly</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-emerald-500 rounded-full"></span> Warehouse</span>
+                        </div>
+                    </div>
+
+                    <!-- Grafik 2: Kepatuhan KYT Tiap Tim & Breakdown (5 Cols) -->
+                    <div class="col-span-5 bg-white p-6 rounded-2xl border-2 border-slate-200 shadow-md flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-2xl font-extrabold text-slate-900 mb-1">Kepatuhan KYT Tiap Tim</h3>
+                            <p class="text-slate-500 font-bold text-base mb-4">Persentase pengisian rutin sebelum shift</p>
+
+                            <div class="space-y-3">
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-full bg-yellow-400 text-slate-900 font-black flex items-center justify-center text-base">1</span>
+                                        <span class="font-extrabold text-xl text-slate-800">Tim Maintenance A</span>
+                                    </div>
+                                    <span class="bg-emerald-100 text-emerald-800 text-lg font-black px-3 py-1 rounded-lg">100%</span>
+                                </div>
+
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-full bg-slate-300 text-slate-800 font-black flex items-center justify-center text-base">2</span>
+                                        <span class="font-extrabold text-xl text-slate-800">Tim Machining Line 1</span>
+                                    </div>
+                                    <span class="bg-emerald-100 text-emerald-800 text-lg font-black px-3 py-1 rounded-lg">98%</span>
+                                </div>
+
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-full bg-amber-600 text-white font-black flex items-center justify-center text-base">3</span>
+                                        <span class="font-extrabold text-xl text-slate-800">Tim Quality Control</span>
+                                    </div>
+                                    <span class="bg-emerald-100 text-emerald-800 text-lg font-black px-3 py-1 rounded-lg">95%</span>
+                                </div>
+
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-black flex items-center justify-center text-base">4</span>
+                                        <span class="font-extrabold text-xl text-slate-800">Tim Fabrication B</span>
+                                    </div>
+                                    <span class="bg-amber-100 text-amber-800 text-lg font-black px-3 py-1 rounded-lg">89%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-orange-50 rounded-xl border border-orange-200 flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-bullhorn text-2xl text-safety-orange"></i>
+                                <div>
+                                    <p class="font-extrabold text-slate-900 text-base">Rekomendasi Safety:</p>
+                                    <p class="text-sm text-slate-700 font-semibold">Tingkatkan inspeksi LOTO pada area Conveyor Belt</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- FOOTER PETUNJUK KEYBOARD GOOGLE TV (PERMANEN) -->
+        <footer class="bg-slate-900 text-white px-8 py-3.5 flex justify-between items-center border-t-2 border-slate-800 text-lg font-bold flex-shrink-0">
+            <div class="flex items-center gap-8">
+                <span class="text-slate-400 uppercase tracking-widest text-sm">Petunjuk Remote / Keyboard TV:</span>
+                <span class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-slate-800 border border-slate-600 rounded text-amber-400 font-mono text-base">Tab</kbd> Pindah Kolom
+                </span>
+                <span class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-slate-800 border border-slate-600 rounded text-amber-400 font-mono text-base">Enter</kbd> Simpan / Pilih
+                </span>
+                <span class="flex items-center gap-2">
+                    <kbd class="px-3 py-1 bg-slate-800 border border-slate-600 rounded text-amber-400 font-mono text-base">&uarr; &darr; &leftarrow; &rightarrow;</kbd> Navigasi Chip & Baris
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-4 text-slate-400 text-base">
+                <span class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-safety-orange"></span> Item Terpilih / Bahaya Utama
+                </span>
+                <span class="text-slate-600">|</span>
+                <span>Pabrik 1 - Kawasan Industri</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
